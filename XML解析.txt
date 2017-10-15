@@ -1,0 +1,91 @@
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+public class ParseSimpleXml {
+	Element root = null;
+
+	public ParseSimpleXml() {
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document doc = builder.parse("5.4.xml");
+			doc.normalize();
+			root = doc.getDocumentElement();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+public	void parse() {
+		System.out.println("<?xml version = \"1.0\"?>");
+		System.out.println("<" + root.getNodeName() + ">");
+		NodeList children = root.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+			if (child.getNodeType() == Node.ELEMENT_NODE) {
+				System.out.print("<" + child.getNodeName() + ">");
+				System.out.print(child.getFirstChild().getNodeValue());
+				System.out.println("</" + child.getNodeName() + ">");
+			}
+		}
+		System.out.println("</" + root.getNodeName() + ">");
+	}
+
+	public static void main(String[] args) {
+		ParseSimpleXml parseSimpleXml = new ParseSimpleXml();
+		parseSimpleXml.parse();
+	}
+}
+
+
+2 假设新文档命名为5.5.xml。Java程序如下所示。
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+public class CreateSimpleXml {
+	public static void main(String[] args) {
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document doc = builder.newDocument();
+			Element team = doc.createElement("Team");
+			Element teamMember = doc.createElement("TeamMember");
+
+			Element empno = doc.createElement("Empno");
+			Attr empnoValue = doc.createAttribute("value");
+			empno.setAttribute(empnoValue.getNodeName(), "30772");
+
+			Element name = doc.createElement("Name");
+			Attr nameValue = doc.createAttribute("value");
+			name.setAttribute(nameValue.getNodeName(), "Manjeet Singh");
+
+			Element designation = doc.createElement("Designation");
+			Attr designationValue = doc.createAttribute("value");
+			designation.setAttribute(designationValue.getNodeName(), "Team Leader.");
+
+			team.appendChild(teamMember);
+			teamMember.appendChild(empno);
+			teamMember.appendChild(name);
+			teamMember.appendChild(designation);
+			doc.appendChild(team);
+
+			TransformerFactory tFactory = TransformerFactory.newInstance();
+			Transformer transformer = tFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new java.io.File("4.5.xml"));
+			transformer.transform(source, result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
